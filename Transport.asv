@@ -19,8 +19,7 @@ global Y;
 global VX;
 global VY;
 global FX;
-global FY;
-global phi;
+global FY
 
 nAtoms = 100;
 X = frameWidth .* rand(1, nAtoms);

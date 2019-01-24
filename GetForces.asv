@@ -24,7 +24,6 @@ for i = 1:nAtoms
        phi(i) = phi(i) + aphi;
        FX(i) = FX(i) + dFx;
        FY(i) = FY(i) + dFy;
-   end
 end
 
 
