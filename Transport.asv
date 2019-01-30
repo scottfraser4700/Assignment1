@@ -4,11 +4,11 @@ C.m_0 = 9.10938215e-31;
 C.eps_0 = 8.854187817e-12;
 C.kb = 1.3806504e-23;
 C.T = 300;
+C.am = 1.66053892e-27;
 frameWidth = 200e-9;
 frameHeight = 100e-9;
 Vth = sqrt(C.kb * C.T / (0.26*C.m_0));
-iteration = 1;
-Tstop = 1e-11;
+Tstop = 1e-10;
 t = 0;
 dt = 1e-14;
 
@@ -17,11 +17,13 @@ nAtoms = 1000;
 Xnext = zeros(1,nAtoms);
 Ynext = zeros(1,nAtoms);
 direction = 2*pi*rand(1, nAtoms);
-VX = Vth * cos(direction);
-VY = Vth * sin(direction);
-X = frameWidth * rand(1, nAtoms);
-Y = frameHeight * rand(1, nAtoms);
-Temperature = zeros(1, 100);
+VX = Vth .* cos(direction);
+VY = Vth .* sin(direction);
+X = frameWidth .* rand(1, nAtoms);
+Y = frameHeight .* rand(1, nAtoms);
+EK = 0;
+Temperature = zeros(1, 10000);
+iteration = 0;
 
 %electrons placed randomly, with uniform velocity and random directions
 
@@ -40,9 +42,9 @@ while t < Tstop
     top = Ynext > frameHeight;
     bottom = Ynext < 0;
     VY(top | bottom) = VY(top | bottom) * -1;
-    %calculations for temperature
-    Temperature(iteration) = 0.26*C.m_0*mean(V.^2)/4/C.kb;
-
+    EK = mean(VX.*VX+VY.*VY);
+    Temperature(iteration) = EK / nAtoms / C.kb;
+    
     %plotting, but avoid plotting the full horizontal jump
     if abs(Xnext(1) - X(1)) < 2*abs(VX(1))*dt
         figure(1)
@@ -71,10 +73,7 @@ while t < Tstop
     X = Xnext;
     Y = Ynext;
     t = t+dt;
-    iteration = iteration + 1;
-    pause(0.0001);
+    itera
+    pause(0.01);
 end
-%plotting temperature, should be constant 
-figure(2)
-dummy = linspace(0,iteration, length(Temperature));
-plot(dummy, Temperature)
+%TODO add calculations for temperature, and plot temperature

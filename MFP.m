@@ -6,29 +6,44 @@ C.kb = 1.3806504e-23;
 C.T = 300;
 frameWidth = 200e-9;
 frameHeight = 100e-9;
-Vth = sqrt(C.kb * C.T / (0.26*C.m_0));
 iteration = 1;
-Tstop = 1e-11;
-t = 0;
-dt = 1e-14;
-
-%initialization of vectors
 nAtoms = 1000;
-Xnext = zeros(1,nAtoms);
-Ynext = zeros(1,nAtoms);
-direction = 2*pi*rand(1, nAtoms);
-VX = Vth * cos(direction);
-VY = Vth * sin(direction);
-X = frameWidth * rand(1, nAtoms);
-Y = frameHeight * rand(1, nAtoms);
+binsize = nAtoms / 10;
+Vth = sqrt(2*C.kb*C.T /(0.26*C.m_0));
+dt = frameHeight/Vth/100;
+Tstop = 1000*dt;
+t = 0;
+freepath = 0.2e-12;
+Pscatter = 1 - exp(-dt/freepath);
+EK = 0;
 Temperature = zeros(1, 100);
 
-%electrons placed randomly, with uniform velocity and random directions
+%initializing vectors
+Xnext = zeros(1,nAtoms);
+Ynext = zeros(1,nAtoms);
+VX = Vth * randn(1,nAtoms);
+VY = Vth * randn(1,nAtoms);
+V = sqrt(VY.*VY+VX.*VX);
+X = frameWidth * rand(1, nAtoms);
+Y = frameHeight * rand(1, nAtoms);
+R = zeros(1, nAtoms);
+%histograms of X and Y velocities
+figure(1)
+subplot(2,1,1);
+hist(VX,binsize)
+title('x velocities')
+subplot(2,1,2);
+hist(VY,binsize)
+title('y velocities')
 
 while t < Tstop
     %for each cycle in time, move electrons in accordance with their
     %velocities
-   
+    R = rand(1,nAtoms);
+    VX(R<Pscatter) = Vth*randn(1);
+    VY(R<Pscatter) = Vth*randn(1);
+    V = sqrt(VY.*VY+VX.*VX);
+    
     Xnext = X + VX*dt;
     Ynext = Y + VY*dt;
     %X boundary conditions set
@@ -42,28 +57,22 @@ while t < Tstop
     VY(top | bottom) = VY(top | bottom) * -1;
     %calculations for temperature
     Temperature(iteration) = 0.26*C.m_0*mean(V.^2)/4/C.kb;
-
+    figure(2)
+    xlim([0 frameWidth])
+    ylim([0 frameHeight])
+    hold on
     %plotting, but avoid plotting the full horizontal jump
     if abs(Xnext(1) - X(1)) < 2*abs(VX(1))*dt
-        figure(1)
+        figure(2)
         plot([Xnext(1) X(1)], [Ynext(1) Y(1)], 'blue')
-        xlim([0 frameWidth])
-        ylim([0 frameHeight])
-        hold on
     end
     if abs(Xnext(2) - X(2)) < 2*abs(VX(2))*dt
-        figure(1)
+        figure(2)
         plot([Xnext(2) X(2)], [Ynext(2) Y(2)], 'red')
-        xlim([0 frameWidth])
-        ylim([0 frameHeight])
-        hold on
     end
     if abs(Xnext(3) - X(3)) < 2*abs(VX(3))*dt
-        figure(1)
+        figure(2)
         plot([Xnext(3) X(3)], [Ynext(3) Y(3)], 'green')
-        xlim([0 frameWidth])
-        ylim([0 frameHeight])
-        hold on
     end
     
     %updating positions, and advancing time a step forward so the while
@@ -75,6 +84,6 @@ while t < Tstop
     pause(0.0001);
 end
 %plotting temperature, should be constant 
-figure(2)
+figure(3)
 dummy = linspace(0,iteration, length(Temperature));
 plot(dummy, Temperature)
