@@ -1,20 +1,17 @@
 %% Section 1 - Electron Modelling
-
 % modelling the motion of these electrons was both interesting and
 % difficult. these electrons start with a constant equal velocity, and it
 % never changes throughout the simulation. For this reason, the temperature
 % of the system never changes. the only way a particle can change direction
 % in this simulation is to bounce off the bottom or top wall. The
 % reflection from the top only reverses the angle, so the particle exhibits
-% periodic motion in a general direction based on its initial angle.
-% 
+% periodic motion in a general direction based on its initial angle. 
 % I spent a great deal of time debugging the plotting. I found that the
 % particles would leave an ugly, unintended horizontal trail behind them
 % when they passed through the right and left walls. Once that was fixed,
 % the rest of the program came together quickly. This program could
 % definitely make use of speed improvements, especially when the simulation
 % lasts for lots of time steps.
-% 
 % The thermal velocity is 1.3224e+5 m/s.
 % the mean free path is 4.85e-8 m.
 
